@@ -2,6 +2,69 @@
 
 A minimal monorepo setup with frontend (React + Vite), dual backend options (Node/Express + TypeScript + Prisma OR Python/FastAPI), and automatic SDK generation from either backend.
 
+## Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph "Frontend :5173"
+        FE[React + Vite + TypeScript]
+    end
+
+    subgraph "SDK Generation"
+        SDK[TypeScript SDK<br/>@technight/api]
+        OAG[OpenAPI Generator]
+    end
+
+    subgraph "Backend Options"
+        subgraph "Node Backend :6173"
+            NODE[Express + TypeScript]
+            PRISMA[Prisma ORM]
+            SWAGGER_NODE[Swagger/OpenAPI]
+        end
+
+        subgraph "Python Backend :6174"
+            PYTHON[FastAPI + Python]
+            SQLALCHEMY[SQLAlchemy ORM]
+            SWAGGER_PY[Swagger/OpenAPI]
+        end
+    end
+
+    subgraph "Database"
+        DB[(PostgreSQL)]
+    end
+
+    FE -->|HTTP Requests| SDK
+    SDK -.->|Option 1| NODE
+    SDK -.->|Option 2| PYTHON
+
+    NODE --> SWAGGER_NODE
+    PYTHON --> SWAGGER_PY
+
+    SWAGGER_NODE -->|OpenAPI Spec| OAG
+    SWAGGER_PY -->|OpenAPI Spec| OAG
+    OAG -->|Generates| SDK
+
+    NODE --> PRISMA
+    PYTHON --> SQLALCHEMY
+    PRISMA --> DB
+    SQLALCHEMY --> DB
+
+    style FE fill:#61dafb,stroke:#333,stroke-width:2px
+    style NODE fill:#68a063,stroke:#333,stroke-width:2px
+    style PYTHON fill:#3776ab,stroke:#333,stroke-width:2px
+    style SDK fill:#3178c6,stroke:#333,stroke-width:2px
+    style DB fill:#336791,stroke:#333,stroke-width:2px
+```
+
+**Key Points:**
+- **Frontend** consumes the auto-generated TypeScript SDK
+- **SDK** is generated from either backend's OpenAPI specification
+- **Node Backend** uses Prisma ORM for database operations
+- **Python Backend** uses SQLAlchemy ORM for database operations
+- Both backends connect to **PostgreSQL** database
+- Both backends expose **Swagger UI** for interactive API documentation
+- Backends can run **simultaneously** on different ports
+
 ## Project Structure
 
 ```
@@ -13,6 +76,7 @@ technight-2025-12/
 │   │   └── server.ts    # Main entry point
 │   └── python/          # FastAPI + Python backend with Swagger
 │       ├── scripts/     # SDK generation script
+│       ├── database.py  # SQLAlchemy database configuration
 │       └── main.py      # Main entry point
 ├── frontend/            # React + Vite + TypeScript
 │   └── src/
@@ -34,6 +98,7 @@ technight-2025-12/
 ### Backend (Python)
 - **Framework**: FastAPI
 - **Language**: Python 3.12
+- **Database ORM**: SQLAlchemy
 - **API Documentation**: Swagger/OpenAPI (auto-generated)
 - **Server**: Uvicorn
 - **Port**: 6174
@@ -133,6 +198,7 @@ python3 main.py
 
 Open your browser and visit:
 - **Health Check**: http://localhost:6174/api/health
+- **Database Health**: http://localhost:6174/api/health/db (checks PostgreSQL connection)
 - **Swagger UI**: http://localhost:6174/api/swagger (interactive API documentation)
 - **OpenAPI Spec**: http://localhost:6174/api/openapi.json
 
@@ -140,6 +206,23 @@ You should see a JSON response like:
 ```json
 {
   "status": "ok",
+  "timestamp": "2025-12-02T10:30:00.000Z"
+}
+```
+
+**Database Health Check Response Examples:**
+```json
+// If database is connected:
+{
+  "connected": true,
+  "message": "Database connection successful",
+  "timestamp": "2025-12-02T10:30:00.000Z"
+}
+
+// If DATABASE_URL is not set:
+{
+  "connected": false,
+  "error": "Database not configured. DATABASE_URL environment variable not set.",
   "timestamp": "2025-12-02T10:30:00.000Z"
 }
 ```
@@ -352,9 +435,9 @@ The Python backend uses `psycopg2-binary` which requires system-level PostgreSQL
    - `uvicorn` - ASGI server
    - `python-dotenv` - Environment variable management
    - `PyYAML` - YAML parsing
-   - `sqlalchemy` - ORM for database
+   - `sqlalchemy` - SQLAlchemy ORM for database operations
    - `psycopg2-binary` - PostgreSQL adapter (requires system dependencies from Step 1)
-   - Another packages listed on requirements.txt file.
+   - Other packages listed in requirements.txt file
 
 3. **Verify installation**:
    ```bash
@@ -707,6 +790,7 @@ npm run dev:frontend
 
 #### Python Backend (Port 6174)
 - **Health Check**: http://localhost:6174/api/health
+- **Database Health**: http://localhost:6174/api/health/db
 - **Swagger UI**: http://localhost:6174/api/swagger
 - **OpenAPI JSON**: http://localhost:6174/api/openapi.json
 - **OpenAPI YAML**: http://localhost:6174/api/openapi.yaml
@@ -806,26 +890,72 @@ const response = await healthApi.apiHealthGet();
 
 ## Database Setup
 
+Both backends include full PostgreSQL support with their respective ORMs.
+
 ### Node Backend (Prisma ORM)
 
-The Node backend includes Prisma ORM. To set up your database:
+The Node backend uses Prisma ORM for database operations.
 
-1. Update `backend/node/.env` with your database URL:
-```
+1. **Update `backend/node/.env`** with your database URL:
+```env
 DATABASE_URL="postgresql://user:password@localhost:5432/mydb?schema=public"
 ```
 
-2. Define your schema in `backend/node/prisma/schema.prisma`
+2. **Define your schema** in `backend/node/prisma/schema.prisma`
 
-3. Run migrations:
+3. **Run migrations**:
 ```bash
 cd backend/node
 npm run prisma:migrate
 ```
 
-### Python Backend (No ORM included)
+4. **Verify database connection**: Visit http://localhost:6173/api/health
 
-The Python backend does not include an ORM by default. You can add SQLAlchemy or another ORM as needed.
+### Python Backend (SQLAlchemy ORM)
+
+The Python backend uses SQLAlchemy ORM for database operations.
+
+1. **Update `backend/python/.env`** with your database URL:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/mydb"
+```
+
+2. **Database module** is located at `backend/python/database.py` and includes:
+   - SQLAlchemy engine with connection pooling
+   - Session management with dependency injection
+   - Base declarative class for models
+   - Database health check function
+
+3. **Check database connection**:
+   - **Basic health**: http://localhost:6174/api/health
+   - **Database health**: http://localhost:6174/api/health/db
+
+4. **Create models** by extending `Base` from `database.py`:
+```python
+from database import Base
+from sqlalchemy import Column, Integer, String
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+```
+
+5. **Use database sessions** in endpoints:
+```python
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from database import get_db
+
+@app.get("/api/users")
+async def get_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return {"users": users}
+```
+
+**Note**: The Python backend gracefully handles missing database configuration. If `DATABASE_URL` is not set, the server will still run but database endpoints will return appropriate error messages.
 
 ## Notes
 
@@ -834,5 +964,7 @@ The Python backend does not include an ORM by default. You can add SQLAlchemy or
 - No extra UI libraries (just React + basic styling)
 - Both backends can run simultaneously on different ports
 - Node backend includes Prisma ORM with empty schema
-- Python backend has no ORM included (add as needed)
+- Python backend includes SQLAlchemy ORM with database module
+- Both backends support PostgreSQL with their respective ORMs
 - SDK can be generated from either backend
+- Python backend includes database health check endpoint (`/api/health/db`)
