@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# SDK generated files
+sdk/ts/
+
+# Prisma
+backend/node/prisma/migrations/dev.db
+backend/node/prisma/migrations/dev.db-journal
+
+# Temporary files
+*.tmp
+.cache/

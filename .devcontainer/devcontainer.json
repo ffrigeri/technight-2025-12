@@ -1,0 +1,52 @@
+{
+  "name": "Technight 2025-12",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [5173, 6173, 7173],
+  "portsAttributes": {
+    "5173": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    },
+    "6173": {
+      "label": "Backend",
+      "onAutoForward": "notify"
+    },
+    "7173": {
+      "label": "Backend (SDK Gen)",
+      "onAutoForward": "ignore"
+    }
+  },
+
+  "postCreateCommand": "npm install && cd backend/node && npm install && cd ../../frontend && npm install",
+
+  "remoteUser": "node"
+}
