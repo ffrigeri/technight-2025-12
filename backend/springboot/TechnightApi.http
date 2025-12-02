@@ -1,0 +1,96 @@
+### TechnightApi Spring Boot - HTTP Test File
+### Use with VS Code REST Client extension or IntelliJ HTTP Client
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Health Check
+GET {{baseUrl}}/api/health
+
+### Get All Examples
+GET {{baseUrl}}/api/examples
+
+### Get Example by ID
+GET {{baseUrl}}/api/examples/1
+
+### Get Non-Existent Example (should return 404)
+GET {{baseUrl}}/api/examples/999
+
+### Create New Example
+POST {{baseUrl}}/api/examples
+Content-Type: {{contentType}}
+
+{
+  "name": "Test Example",
+  "title": "Test Title",
+  "description": "This is a test example created via HTTP client",
+  "isActive": true
+}
+
+### Create New Example (without optional fields)
+POST {{baseUrl}}/api/examples
+Content-Type: {{contentType}}
+
+{
+  "name": "Minimal Example",
+  "title": "Minimal Title"
+}
+
+### Create Invalid Example (missing required fields - should return 400)
+POST {{baseUrl}}/api/examples
+Content-Type: {{contentType}}
+
+{
+  "description": "This will fail because name and title are required"
+}
+
+### Update Example (ID 1)
+PUT {{baseUrl}}/api/examples/1
+Content-Type: {{contentType}}
+
+{
+  "name": "Updated Example Name",
+  "title": "Updated Title",
+  "description": "This example has been updated",
+  "isActive": false
+}
+
+### Partial Update Example (ID 2) - Only update name
+PUT {{baseUrl}}/api/examples/2
+Content-Type: {{contentType}}
+
+{
+  "name": "Partially Updated Example"
+}
+
+### Update Non-Existent Example (should return 404)
+PUT {{baseUrl}}/api/examples/999
+Content-Type: {{contentType}}
+
+{
+  "name": "This will fail"
+}
+
+### Search Examples by Name
+GET {{baseUrl}}/api/examples/search?name=First
+
+### Search Examples (empty query - should return all)
+GET {{baseUrl}}/api/examples/search
+
+### Search Examples (no match)
+GET {{baseUrl}}/api/examples/search?name=NonExistent
+
+### Delete Example (ID 2)
+DELETE {{baseUrl}}/api/examples/2
+
+### Delete Non-Existent Example (should return 404)
+DELETE {{baseUrl}}/api/examples/999
+
+### OpenAPI Specification (JSON)
+GET {{baseUrl}}/api/openapi
+
+### Swagger UI (HTML page)
+GET {{baseUrl}}/swagger
+
+###
+
