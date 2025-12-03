@@ -125,7 +125,7 @@ Debes únicamente utilizar una de estas tecnologías para trabajar en modo agén
 
 You can use the Gemini Key provided with this configuration: https://geminicli.com/docs/get-started/authentication/#gemini-api
 
-| **Claude Code / OpenAI Codex (Evaluation) ** ➕ | Si lo tienes en tu stack y lo prefieres para esta technight! |
+| **Claude Code or OpenAI Codex** ➕ | Si lo tienes en tu stack y lo prefieres para esta technight! |
 
 <img width="1336" height="194" alt="image" src="https://github.com/user-attachments/assets/5409584b-7810-4206-b718-66e263b595c9" />
 
