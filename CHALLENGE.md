@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Desarrollar una experiencia via web app visualmente atractiva con **gamificación** y **mucho IA** 😂 para la recepción de encuestas/feedback/votacion de eventos/reuniones/webinars, medir participación y/o asistencia para utilizar durante la misma en todas las presentaciones de NYBBLE GROUP integrable a nuestro hub como un espacio social.
+Desarrollar una experiencia inteligente via web app visualmente atractiva con **gamificación** y **mucho IA** 😂 para la recepción de encuestas/feedback/votacion de eventos/reuniones/webinars, medir participación y/o asistencia para utilizar durante la misma en todas las presentaciones de NYBBLE GROUP integrable a nuestro hub como un espacio social.
 
 ### Características Principales
 
@@ -147,6 +147,7 @@ You can switch model if needed it with /model command.
 ### 5. API Keys
 
 - 🔑 **Gemini API Key** para uso de AI
+- Como usar en el app => https://ai.google.dev/gemini-api/docs?hl=es-419
 - Provisto por el equipo el día del evento
 
 ## Consejos para el Éxito
